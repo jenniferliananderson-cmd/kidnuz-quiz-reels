@@ -2,9 +2,9 @@
 
 Every weekday morning this makes and posts:
 
-- a **9:16 Reel**: the first quiz question, read by the host, written on word by word, then "Listen to find out" and kidnuz.org/podcast
+- a **9:16 Reel** (on Instagram it goes to the Reels tab only, not the profile grid): the first quiz question, read by the host, written on word by word, then "Listen to find out" and kidnuz.org/podcast
 - the same video as an **Instagram Story**
-- a **4:5 still** of the finished frame for the Instagram and Facebook feeds
+- a **4:5 still** of the finished frame for the Instagram and Facebook feeds (this is the day's one Instagram grid post)
 
 It posts to Instagram, the KidNuz Facebook Page and TikTok at about 6:30 a.m. Pacific, through Buffer.
 

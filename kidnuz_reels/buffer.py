@@ -80,7 +80,7 @@ class Buffer:
 
     # ---------- what KidNuz posts each day ----------
     def ig_reel(self, video_url: str, caption: str) -> str:
-        return self._post("instagram", caption, {"video": {"url": video_url}}, {"type": "reel", "shouldShareToFeed": True})
+        return self._post("instagram", caption, {"video": {"url": video_url}}, {"type": "reel", "shouldShareToFeed": False})  # Reels tab only; the still is the grid post
 
     def ig_story(self, video_url: str) -> str:
         return self._post("instagram", "", {"video": {"url": video_url}}, {"type": "story", "shouldShareToFeed": False})

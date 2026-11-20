@@ -51,7 +51,7 @@ class Meta:
         if caption:
             data["caption"] = caption
         if media_type == "REELS":
-            data["share_to_feed"] = "true"
+            data["share_to_feed"] = "false"  # Reels tab only; the still is the grid post
         c = self._ok(requests.post(f"{GRAPH}/{self.ig}/media", data=data, timeout=60))
         size = path.stat().st_size
         with open(path, "rb") as f:
