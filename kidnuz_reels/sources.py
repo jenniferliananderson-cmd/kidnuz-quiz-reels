@@ -72,12 +72,21 @@ def first_question(pdf_url: str) -> str:
 def episode_page_url(page, title: str) -> str:
     """The episode's own page on kidnuz.org, e.g. https://www.kidnuz.org/podcast/episode/39432ef3/111926."""
     try:
-        page.goto(PODCAST_PAGE, wait_until="domcontentloaded", timeout=60000)
-        item = page.get_by_text(title, exact=True).first
-        item.wait_for(timeout=30000)
-        item.click()
-        page.wait_for_url(re.compile(r"/podcast/episode/"), timeout=20000)
-        return page.url.split("?")[0]
+        page.goto(PODCAST_PAGE, wait_until="networkidle", timeout=90000)
+        # 1. a plain link to the episode, anywhere on the page or inside its embedded frames
+        for frame in page.frames:
+            for a in frame.locator("a[href*='/podcast/episode/']").all():
+                href = a.get_attribute("href") or ""
+                if href.rstrip("/").endswith(title.replace(".", "")):
+                    return href.split("?")[0]
+        # 2. otherwise click the episode title (it may live in an embedded frame) and read the new address
+        for frame in page.frames:
+            item = frame.get_by_text(title, exact=True).first
+            if item.count():
+                item.click()
+                page.wait_for_url(re.compile(r"/podcast/episode/"), timeout=20000)
+                return page.url.split("?")[0]
+        raise RuntimeError(f"'{title}' isn't listed on the podcast page yet")
     except Exception as err:  # the general podcast page is a fine fallback
         print(f"Couldn't find the episode page for {title}: {err}. Using the podcast page instead.")
         return PODCAST_PAGE

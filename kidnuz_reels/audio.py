@@ -42,11 +42,12 @@ def _norm(w: str) -> str:
 
 def transcribe_words(mp3: Path, workdir: Path):
     from faster_whisper import WhisperModel
-    head = workdir / "head.wav"
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(mp3), "-t", str(SCAN_SECONDS),
-                    "-ac", "1", "-ar", "16000", str(head)], check=True)
+    # decode with ffmpeg ourselves and hand Whisper raw samples (avoids its PyAV decoder)
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(mp3), "-t", str(SCAN_SECONDS),
+                          "-ac", "1", "-ar", "16000", "-f", "s16le", "-"], check=True, capture_output=True).stdout
+    samples = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768
     model = WhisperModel("small.en", device="cpu", compute_type="int8")
-    segments, _ = model.transcribe(str(head), word_timestamps=True, vad_filter=False,
+    segments, _ = model.transcribe(samples, word_timestamps=True, vad_filter=False,
                                    initial_prompt="KidNuz. But first, today's KidNuz Quiz:")
     return [w for s in segments for w in (s.words or [])]
 
