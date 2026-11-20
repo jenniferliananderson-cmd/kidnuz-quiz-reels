@@ -72,7 +72,8 @@ def first_question(pdf_url: str) -> str:
 def episode_page_url(page, title: str) -> str:
     """The episode's own page on kidnuz.org, e.g. https://www.kidnuz.org/podcast/episode/39432ef3/111926."""
     try:
-        page.goto(PODCAST_PAGE, wait_until="networkidle", timeout=90000)
+        page.goto(PODCAST_PAGE, wait_until="load", timeout=90000)
+        page.wait_for_timeout(6000)  # the episode list loads after the page
         # 1. a plain link to the episode, anywhere on the page or inside its embedded frames
         for frame in page.frames:
             for a in frame.locator("a[href*='/podcast/episode/']").all():

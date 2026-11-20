@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import requests
 
-SCAN_SECONDS = 300          # the quiz comes near the top of the episode
+SCAN_SECONDS = 480          # the quiz comes in the first few minutes (4:20 on 11.19.26)
 MAX_QUESTION_SECONDS = 40
 
 
@@ -43,7 +43,7 @@ def _norm(w: str) -> str:
 def transcribe_words(mp3: Path, workdir: Path):
     from faster_whisper import WhisperModel
     # decode with ffmpeg ourselves and hand Whisper raw samples (avoids its PyAV decoder)
-    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(mp3), "-t", str(SCAN_SECONDS),
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(mp3), "-vn", "-t", str(SCAN_SECONDS),
                           "-ac", "1", "-ar", "16000", "-f", "s16le", "-"], check=True, capture_output=True).stdout
     samples = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768
     model = WhisperModel("small.en", device="cpu", compute_type="int8")
@@ -64,7 +64,7 @@ def find_question(words, question: str) -> Clip:
         cue = next((i for i, w in enumerate(norm) if w.startswith("quiz")), None)
     if cue is None or cue + 1 >= len(words):
         heard = " ".join(w.word.strip() for w in words[:80])
-        raise RuntimeError("Couldn't hear 'today's KidNuz Quiz' in the first five minutes. Heard: " + heard)
+        raise RuntimeError("Couldn't hear 'today's KidNuz Quiz' in the first eight minutes. Heard: " + heard)
     first = cue + 1
     start = max(0.0, words[first].start - 0.12)
 
@@ -99,7 +99,7 @@ def find_question(words, question: str) -> Clip:
 
 def cut(mp3: Path, clip: Clip, dest: Path) -> Path:
     dur = clip.end - clip.start
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{clip.start:.3f}", "-t", f"{dur:.3f}", "-i", str(mp3),
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{clip.start:.3f}", "-t", f"{dur:.3f}", "-i", str(mp3), "-vn",
                     "-af", f"afade=t=in:d=0.04,afade=t=out:st={max(0, dur - 0.25):.3f}:d=0.25",
                     "-ac", "2", "-ar", "44100", "-c:a", "aac", "-b:a", "160k", str(dest)], check=True)
     return dest
@@ -107,7 +107,7 @@ def cut(mp3: Path, clip: Clip, dest: Path) -> Path:
 
 def levels(clip_audio: Path, fps: int = 30) -> list[float]:
     """Loudness per video frame, 0..1, so the sound wave follows the voice."""
-    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(clip_audio), "-ac", "1", "-ar", "16000",
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(clip_audio), "-vn", "-ac", "1", "-ar", "16000",
                           "-f", "s16le", "-"], check=True, capture_output=True).stdout
     x = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768
     hop = 16000 // fps
