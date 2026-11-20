@@ -32,6 +32,9 @@ OUT = ROOT / "out"
 PACIFIC = ZoneInfo("America/Los_Angeles")
 POST_AFTER = (6, 25)  # 6:25 a.m. Pacific
 DRY = os.environ.get("DRY_RUN") == "1"
+if not DRY and not os.environ.get("META_TOKEN"):
+    print("No META_TOKEN secret yet, so this run makes the files without posting.")
+    DRY = True
 FORCE = os.environ.get("FORCE") == "1"
 HASHTAGS = "#KidNuz #NewsForKids #KidsNews #CurrentEvents #KidsPodcast"
 
