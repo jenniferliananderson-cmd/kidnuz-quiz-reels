@@ -1,0 +1,66 @@
+name: Daily KidNuz quiz
+
+on:
+  schedule:
+    # Weekdays. GitHub runs on UTC and can start a little late; the script itself waits until
+    # 6:25 a.m. Pacific, so these runs cover both standard and daylight time plus a few retries.
+    - cron: "40 13 * * 1-5"
+    - cron: "40 14 * * 1-5"
+    - cron: "40 15 * * 1-5"
+    - cron: "40 17 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Make the Reel and still without posting"
+        type: boolean
+        default: true
+      force:
+        description: "Ignore the posting time and use the newest episode even if it isn't today's"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-quiz
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+      - name: Cache speech model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: whisper-small-en
+      - name: Make and post
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '1' || '0' }}
+          FORCE: ${{ (github.event_name == 'workflow_dispatch' && inputs.force) && '1' || '0' }}
+        run: python run.py
+      - name: Keep today's files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kidnuz-quiz-${{ github.run_id }}
+          path: |
+            out/
+            media/
+          if-no-files-found: ignore
+          retention-days: 30
