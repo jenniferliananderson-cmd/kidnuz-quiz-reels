@@ -90,8 +90,12 @@ def main() -> int:
     state = json.loads(STATE.read_text()) if STATE.exists() else {}
     ep = sources.latest_episode()
     print(f"Latest episode: {ep.title} ({ep.date:%a %b %d %H:%M %Z})")
+    # Three dates must match before anything posts: today's date, the newest RSS episode's date,
+    # and a "Quiz for <today>" PDF on kidnuz.org/dailyquiz (checked below). On holidays and breaks
+    # the newest episode and quiz are from an earlier day, so nothing is posted and nothing repeats.
     if not FORCE and ep.date.astimezone(PACIFIC).date() != now.date():
-        print("Today's episode isn't in the feed yet; will try again on the next run.")
+        print(f"No new episode for {now:%a %b %d}: the newest in the RSS feed is '{ep.title}' "
+              f"from {ep.date:%a %b %d}. Skipping today (holiday or not uploaded yet); nothing posted.")
         return 0
     done = state.setdefault(ep.guid, {"title": ep.title})
     wanted = ["ig_reel", "ig_story", "ig_image", "fb_reel", "fb_photo", "tiktok"]
@@ -109,6 +113,10 @@ def main() -> int:
         browser = pw.chromium.launch()
         web = browser.new_page()
         pdf = sources.quiz_pdf_url(web, ep.date)
+        if pdf is None:
+            print(f"No '{sources._quiz_label(ep.date)}' quiz on kidnuz.org/dailyquiz yet. "
+                  "Skipping today (holiday or not uploaded yet); nothing posted.")
+            return 0
         question = sources.first_question(pdf)
         link = sources.episode_page_url(web, ep.title)
         web.close()

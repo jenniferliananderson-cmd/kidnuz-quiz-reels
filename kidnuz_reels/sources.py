@@ -43,12 +43,18 @@ def _quiz_label(d: datetime) -> str:
     return f"Quiz for {d.strftime('%B')} {d.day}, {d.year}"
 
 
-def quiz_pdf_url(page, d: datetime) -> str:
-    """Find the 'Quiz for <Month D, YYYY>' link on the Daily Quiz page (rendered with Playwright)."""
+def quiz_pdf_url(page, d: datetime) -> str | None:
+    """Find the 'Quiz for <Month D, YYYY>' link on the Daily Quiz page (rendered with Playwright).
+
+    Returns None if the page has quizzes but none for this date (e.g. a holiday)."""
     page.goto(QUIZ_PAGE, wait_until="domcontentloaded", timeout=60000)
+    # wait until the quiz list has loaded at all, so "not posted yet" isn't confused with "page still loading"
+    page.get_by_role("link", name=re.compile(r"Quiz for", re.I)).first.wait_for(timeout=45000)
+    page.wait_for_timeout(2000)
     label = _quiz_label(d)
     link = page.get_by_role("link", name=re.compile(re.escape(label), re.I)).first
-    link.wait_for(timeout=30000)
+    if not link.count():
+        return None
     href = link.get_attribute("href")
     if not href:
         raise RuntimeError(f"Found '{label}' on the quiz page but it has no link.")
