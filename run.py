@@ -156,6 +156,13 @@ def main() -> int:
             "fb_photo": lambda: buf.fb_photo(still_url, fb_cap),
             "tiktok": lambda: buf.tiktok(reel_url, tt_cap),
         }
+        # Accounts not connected in Buffer yet (e.g. TikTok while it's being sorted out) are skipped quietly.
+        connected = buf.channels()
+        for name, service in {"ig_reel": "instagram", "ig_story": "instagram", "ig_image": "instagram",
+                              "fb_reel": "facebook", "fb_photo": "facebook", "tiktok": "tiktok"}.items():
+            if service not in connected and name not in done:
+                print(f"{name}: skipped, no {service} account connected in Buffer yet")
+                jobs.pop(name)
     else:
         meta = Meta(os.environ["META_TOKEN"], os.environ["IG_USER_ID"], os.environ["FB_PAGE_ID"])
         jobs = {
