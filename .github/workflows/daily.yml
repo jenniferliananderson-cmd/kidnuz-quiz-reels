@@ -48,6 +48,7 @@ jobs:
           key: whisper-small-en
       - name: Make and post
         env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           META_TOKEN: ${{ secrets.META_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
