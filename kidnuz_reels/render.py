@@ -14,9 +14,11 @@ FPS = 30
 
 def _open(browser, width: int, height: int):
     page = browser.new_page(viewport={"width": width, "height": height}, device_scale_factor=1)
-    page.goto(TEMPLATE, wait_until="networkidle", timeout=60000)
-    page.evaluate("document.fonts.ready")
-    ok = page.evaluate("document.fonts.check('40px Fraunces') && document.fonts.check('600 40px Poppins')")
+    page.goto(TEMPLATE, wait_until="load", timeout=60000)
+    # load every face the design uses before checking, so frame 1 is already in the right type
+    page.evaluate("""Promise.all(['400 40px Fraunces', '500 40px Fraunces', '500 40px Poppins', '600 40px Poppins']
+        .map(f => document.fonts.load(f, 'KidNuz Quiz'))).then(() => document.fonts.ready)""")
+    ok = page.evaluate("document.fonts.check('400 40px Fraunces') && document.fonts.check('600 40px Poppins')")
     if not ok:
         raise RuntimeError("The Fraunces/Poppins fonts didn't load, so the video would use the wrong type.")
     return page
