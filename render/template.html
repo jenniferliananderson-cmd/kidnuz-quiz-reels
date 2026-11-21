@@ -41,7 +41,7 @@ html,body{margin:0;padding:0;background:#000}
 <body>
 <div class="reel" id="reel">
   <div class="card"><div class="glow"></div></div>
-  <div class="logo"><img id="logoimg" src="../assets/logo-color.png" alt=""></div>
+  <div class="logo"><img id="logoimg" src="../assets/logo-white-wordmark.png" alt=""></div>
   <div class="snd" id="snd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12.5 5v14l-5-4.5H4z" fill="currentColor"/><path d="M16 9a4.2 4.2 0 0 1 0 6"/><path d="M18.8 6.4a8 8 0 0 1 0 11.2"/></svg>Sound on</div>
   <div class="tab" id="tab">Today on KidNuz</div>
   <div class="q" id="q"></div>
@@ -52,8 +52,7 @@ html,body{margin:0;padding:0;background:#000}
 <script>
 {
   // Monday..Friday frame colours
-  const FRAMES = ['#04b0d2', '#fbba22', '#ef442a', '#ffffff',
-    'repeating-linear-gradient(135deg,#04b0d2 0 7cqw,#fbba22 7cqw 14cqw,#ef442a 14cqw 21cqw)'];
+  const FRAMES = ['#04b0d2', '#fbba22', '#ef442a', '#ffffff', '#3fb54a'];
   const $ = id => document.getElementById(id);
   const reel = $('reel'), q = $('q'), wave = $('wave'), cta = $('cta'), lk = $('lk'), tab = $('tab'), logo = document.querySelector('.logo');
   wave.innerHTML = Array.from({length: 28}, () => '<i></i>').join('');
