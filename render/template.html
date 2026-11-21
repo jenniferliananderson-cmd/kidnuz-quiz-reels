@@ -22,15 +22,15 @@ html,body{margin:0;padding:0;background:#000}
 .glow{position:absolute;inset:-20%;background:radial-gradient(60% 40% at 82% 16%,var(--g1),transparent 70%),radial-gradient(55% 35% at 8% 94%,var(--g2),transparent 70%)}
 .logo{position:absolute;left:8cqw;top:8cqw;width:46cqw}
 .logo img{display:block;width:100%;height:auto}
-.tab{position:absolute;left:8cqw;top:52.5cqw;color:#fbba22;font-weight:600;font-size:4.2cqw;line-height:1.3;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}
-.q{position:absolute;left:8cqw;right:8cqw;top:61cqw;font-family:Fraunces,Georgia,serif;font-optical-sizing:auto;font-weight:400;line-height:1.12;letter-spacing:-.01em;text-wrap:pretty;text-align:left}
+.tab{position:absolute;left:12cqw;top:52.5cqw;color:#fbba22;font-weight:600;font-size:4.2cqw;line-height:1.3;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}
+.q{position:absolute;left:12cqw;right:8cqw;top:61cqw;font-family:Fraunces,Georgia,serif;font-optical-sizing:auto;font-weight:400;line-height:1.12;letter-spacing:-.01em;text-wrap:pretty;text-align:left}
 .q span{display:inline-block;opacity:0;white-space:pre}
 .cta,.lk{position:absolute;font-family:Fraunces,Georgia,serif;font-optical-sizing:auto;font-weight:500;line-height:1.1;opacity:0}
-.cta{left:8cqw;max-width:78cqw;top:144cqw;background:var(--cb);color:var(--ck);border-radius:5cqw;transform-origin:12% 120%}
+.cta{left:12cqw;max-width:74cqw;top:144cqw;background:var(--cb);color:var(--ck);border-radius:5cqw;transform-origin:12% 120%}
 .cta::after{content:"";position:absolute;left:9cqw;bottom:-4.2cqw;border:2.5cqw solid transparent;border-top:2.3cqw solid var(--cb);border-left:2.5cqw solid var(--cb)}
 .lk{display:flex;right:11cqw;top:123cqw;background:var(--lb);color:var(--lk);border-radius:4.5cqw;transform-origin:88% 120%;box-shadow:0 1.2cqw 0 rgba(10,20,70,.22)}
 .lk::after{content:"";position:absolute;right:7cqw;bottom:-3.8cqw;border:2.2cqw solid transparent;border-top:2cqw solid var(--lb);border-right:2.2cqw solid var(--lb)}
-.wave{position:absolute;left:8cqw;right:8cqw;top:117cqw;height:7cqw;display:flex;align-items:center;gap:1.1cqw}
+.wave{position:absolute;left:12cqw;right:8cqw;top:117cqw;height:7cqw;display:flex;align-items:center;gap:1.1cqw}
 .wave i{flex:1;background:var(--wv);border-radius:1cqw;height:20%}
 .snd{position:absolute;right:8cqw;top:11cqw;display:flex;align-items:center;gap:1.6cqw;background:#fbba22;color:#22307a;
   font-weight:600;font-size:4.2cqw;letter-spacing:.04em;padding:2cqw 3.6cqw 2cqw 3cqw;border-radius:10cqw;box-shadow:0 1cqw 0 rgba(10,20,70,.22)}
@@ -72,8 +72,15 @@ html,body{margin:0;padding:0;background:#000}
     q.innerHTML = words.map((w, k) => `<span>${w.replace(/&/g, '&amp;').replace(/</g, '&lt;')}${k < words.length - 1 ? ' ' : ''}</span>`).join('');
     spans = [...q.children];
     const cq = reel.clientWidth / 100, toCq = px => px / cq, n = cfg.text.length;
-    const L = feed ? {logoW: 30, tabTop: 34, qTop: 42, bub: 5.6} : {logoW: 46, tabTop: 52.5, qTop: 61, bub: 6.8};
-    logo.style.width = L.logoW + 'cqw'; tab.style.top = L.tabTop + 'cqw'; q.style.top = L.qTop + 'cqw';
+    const L = feed ? {logoW: 26, tabTop: 29, qTop: 37, bub: 5.6} : {logoW: 40, tabTop: 44, qTop: 52.5, bub: 6.8};
+    // left alignment: the K of the wordmark starts 111px into the 640px-wide logo and sits on the text line TL
+    const TL = feed ? 12 : 14.5, K = 111 / 640;
+    logo.style.width = L.logoW + 'cqw'; logo.style.left = (TL - K * L.logoW) + 'cqw';
+    for (const el of [tab, q, cta, wave]) el.style.left = TL + 'cqw';
+    cta.style.maxWidth = (92 - TL - 4) + 'cqw';
+    // 'Sound on' badge centred on the logo's height
+    const logoH = L.logoW * 375 / 640, snd = document.getElementById('snd');
+    snd.style.top = (8 + logoH / 2) + 'cqw'; snd.style.transform = 'translateY(-50%)'; tab.style.top = L.tabTop + 'cqw'; q.style.top = L.qTop + 'cqw';
     for (const el of [cta, lk]) { el.style.fontSize = L.bub + 'cqw'; el.style.padding = (L.bub * 0.62) + 'cqw ' + (L.bub * 0.8) + 'cqw'; }
     let qLimit;
     if (feed) {

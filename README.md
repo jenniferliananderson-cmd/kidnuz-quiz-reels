@@ -15,7 +15,7 @@ It posts to Instagram, the KidNuz Facebook Page and TikTok at about 6:30 a.m. Pa
 
    **It only posts when three dates match: today's date, the newest RSS episode's date, and a "Quiz for <today>" PDF on the quiz page.** On holidays and breaks (e.g. Monday when the newest episode and quiz are still Friday's), it posts nothing, so nothing is ever repeated.
 3. Transcribes the first five minutes of the episode, finds "But first, today's KidNuz Quiz:", and cuts the audio from there to the end of the question.
-4. Renders the approved design (`render/template.html`) frame by frame into an MP4, plus a JPEG still. The frame colour follows the weekday: cyan Monday, yellow Tuesday, red Wednesday, white Thursday, green Friday. The logo uses a white "KidNuz" wordmark (`assets/logo-white-wordmark.png`).
+4. Renders the approved design (`render/template.html`) frame by frame into an MP4, plus a JPEG still. The frame colour follows the weekday: cyan Monday, yellow Tuesday, red Wednesday, white Thursday, green Friday. The logo is the wordmark without the "Daily News To Grow On" tagline, with "KidNuz" in white (`assets/logo-white-wordmark.png`); its K lines up with the text column.
 5. Publishes today's video and still in the public `media/` folder (kept 21 days), posts them through Buffer, and records what it posted in `state/posted.json`, so a re-run never posts twice.
 
 Each run's files (video, still, captions, and what the transcript heard) are saved under the run's **Artifacts** in the Actions tab for 30 days.
